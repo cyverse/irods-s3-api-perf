@@ -1,0 +1,76 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""
+iRODS S3 API performance testing
+
+Usage:
+    s3-api-perf BUCKET
+
+Parameters:
+    BUCKET  the iRODS S3 bucket used during testing
+
+Description:
+    This script will compare the performance of the S3 API to that of iCommands
+    and GoCommands for selected operations. The S3 API will be accessed using
+    AWS CLI. The operations supported are uploads and downloads of 1 kiB and
+    1 GiB files.
+
+Output:
+    The performance results are written to stdout, while all notification
+    messages, like progress updates, are written to stderr. This allows
+    performance results to be redirected to a file. If stdout is redirected,
+    performance results will be written to both stdout and stderr.
+"""
+
+import sys
+from sys import stderr, stdout
+from typing import List
+
+from aws import AWS
+from gocommands import GoCommands
+from icommands import ICommands
+from suite import PerformanceSuite, Recorder
+from tests import DownloadTestFactory, UploadTestFactory
+
+
+_1_GIB = 2 ** 30
+_1_KIB = 2 ** 10
+
+_RUNS_PER_TEST = 5
+
+
+class _Console(Recorder):
+
+    def notify(self, msg):
+        stderr.write(f'{msg}\n')
+
+    def log(self, result):
+        stdout.write(f'{result}\n')
+        if not stdout.isatty():
+            self.notify(result)
+
+
+def main(argv: List[str]) -> int:
+    """ This is the entry point. """
+    if not argv:
+        print("The name of the iRODS S3 bucket is required.")
+        return 1
+    bucket = argv[1]
+    tools=[
+        AWS(bucket),
+        GoCommands(),
+        ICommands(),
+    ]
+    test_makers = [
+        UploadTestFactory(_1_KIB),
+        UploadTestFactory(_1_GIB),
+        DownloadTestFactory(_1_KIB),
+        DownloadTestFactory(_1_GIB)
+    ]
+    PerformanceSuite(_RUNS_PER_TEST, tools, test_makers).run(_Console())
+    return 0
+
+
+if __name__ == '__main__':
+    sys.exit(main(sys.argv))
