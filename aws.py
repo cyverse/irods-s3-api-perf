@@ -6,6 +6,7 @@ import subprocess
 
 from suite import Tool
 
+_READ_TIMEOUT = 300
 
 class AWS(Tool):
     """TODO document"""
@@ -23,7 +24,15 @@ class AWS(Tool):
         self.__cp(path, self.__mk_path_uri(path))
 
     def __cp(self, src, dest):
-        subprocess.run(['aws', 's3', 'cp', '--only-show-errors', src, dest], check=False)
+        exe = [
+            'aws',
+            '--cli-read-timeout=' + str(_READ_TIMEOUT),
+            's3',
+            'cp',
+            '--only-show-errors',
+            src,
+            dest ]
+        subprocess.run(exe, check=False)
 
     def __mk_path_uri(self, path):
         return self.__bucket_uri + '/' + path
