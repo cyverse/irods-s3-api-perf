@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 
-"""
-This is the implementation of a Tool class for testing transfers using the AWS
-CLI.
+""" This is the implementation of a Tool class for the AWS CLI.
 
-This tool requires that aws-cli 2.15+ is installed. It also requires that the
-CLI be configured to connect to the performance testing iRODS zone by default.
+This tool requires that AWS CLI version 2.15+ is installed. It also requires
+that the CLI be configured to connect to the performance testing iRODS zone by
+default.
 """
 
 import subprocess
