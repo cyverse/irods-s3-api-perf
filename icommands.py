@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
 
-"""TODO document"""
+"""This is the implementation of a Tool class for iCommands.
+
+This tool requires that iCommands version 4.3+ is installed. It also requires
+that an iCommands session be initialized for the iRODS zone where performance
+testing will happen.
+"""
 
 import subprocess
 
@@ -8,7 +13,7 @@ from suite import TestFailure, Tool
 
 
 class ICommands(Tool):
-    """TODO document"""
+    """This provides the transfer logic for testing iCommands."""
 
     def name(self):
         return 'iCommands'
