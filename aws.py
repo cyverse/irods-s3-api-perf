@@ -1,6 +1,12 @@
 # -*- coding: utf-8 -*-
 
-"""TODO document"""
+"""
+This is the implementation of a Tool class for testing transfers using the AWS
+CLI.
+
+This tool requires that aws-cli 2.15+ is installed. It also requires that the
+CLI be configured to connect to the performance testing iRODS zone by default.
+"""
 
 import subprocess
 
@@ -8,10 +14,15 @@ from suite import Tool
 
 _READ_TIMEOUT = 300
 
-class AWS(Tool):
-    """TODO document"""
 
-    def __init__(self, bucket: str):
+class AWS(Tool):
+    """This provides the transfer logic for testing AWS CLI.
+    Parameters:
+        bucket  This is the name of the bucket where data will be transferred to
+            and from.
+    """
+
+    def __init__(self, bucket:str):
         self.__bucket_uri = 's3://' + bucket
 
     def name(self):
