@@ -1,6 +1,28 @@
 # -*- coding: utf-8 -*-
 
-"""TODO document"""
+"""
+This provides the logic for performing transfer tests independent of the
+transfer tool. It provides logic for both uploads and downloads.
+
+An upload test performs the following actions. During setup, it creates a file
+of a specific size named "test" locally in the current working directory. Then,
+during its run phase, it uses the Tool object under test to upload this file.
+Finally, during teardown, it deletes both the data object created by the upload
+and the local file.
+
+A download test performs the following actions. During setup, it creates a local
+file in the current working directory of the size of the data object to be
+downloaded. This file is named "test". While still in the set up phase, it
+uploads the file to the current working collection in iRODS. The new data object
+is also named "test". After the file is uploaded it is deleted. During the run
+phase, it uses the Tool object under test to download the data object. Finally,
+during teardown, it deletes both the data object and the file created by the
+download.
+
+The Python iRODS Client is used to perform the file transfers and clean up tasks
+that happen during setup and teardown. This module assumes that an iRODS session
+has been initialized for the zone where performance testing will happen.
+"""
 
 import os
 from os import path
@@ -70,7 +92,10 @@ class _DownloadTest(Test):
 
 
 class DownloadTestFactory(TestFactory):
-    """TODO document"""
+    """This is a factory for generating Test objects for download testing.
+    Parameters:
+        data_size  This is the size in bytes of the data object to download.
+    """
 
     def __init__(self, data_size: int):
         self.__data_size = data_size
@@ -106,7 +131,10 @@ class _UploadTest(Test):
 
 
 class UploadTestFactory(TestFactory):
-    """TODO document"""
+    """This is a factory for generating Test objects for upload testing.
+    Parameters:
+        data_size  This is the size in bytes of the file to upload.
+    """
 
     def __init__(self, data_size: int):
         self.__data_size = data_size

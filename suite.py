@@ -10,10 +10,11 @@ one-geometric standard deviation from the times it took the tool to perform the
 action.
 
 A PerformanceSuite object is responsible for doing the performance comparison.
-It requires a set of Tool objects, one for teach tool under test, and a set of
-TestFactory objects, one for each action being performed. The PerformanceSuite
-uses these TestFactory objects to create Test objects. A Test measures the time
-it takes a single Tool to perform a certain action once.
+It requires a set of Tool objects, one for teach tool under test, a set of
+TestFactory objects, one for each action being performed, and a Recorder object,
+where results are sent. The PerformanceSuite uses these TestFactory objects to
+create Test objects. A Test measures the time it takes a single Tool to perform
+a certain action once.
 """
 
 from abc import ABC, abstractmethod
