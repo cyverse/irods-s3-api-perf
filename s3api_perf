@@ -51,8 +51,7 @@ class _Console(Recorder):
             self.notify(result)
 
 
-def main(argv: List[str]) -> int:
-    """ This is the entry point. """
+def _main(argv: List[str]) -> int:
     if not argv:
         print("The name of the iRODS S3 bucket is required.")
         return 1
@@ -73,4 +72,4 @@ def main(argv: List[str]) -> int:
 
 
 if __name__ == '__main__':
-    sys.exit(main(sys.argv))
+    sys.exit(_main(sys.argv))
