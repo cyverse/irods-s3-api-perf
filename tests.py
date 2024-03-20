@@ -7,21 +7,22 @@ transfer tool. It provides logic for both uploads and downloads.
 An upload test performs the following actions. During setup, it creates a file
 of a specific size named "test" locally in the current working directory. Then,
 during its run phase, it uses the Tool object under test to upload this file.
-Finally, during teardown, it deletes both the data object created by the upload
-and the local file.
+Finally, during teardown, it deletes both the data object and the local file
+created by the upload
 
-A download test performs the following actions. During setup, it creates a local
-file in the current working directory of the size of the data object to be
-downloaded. This file is named "test". While still in the set up phase, it
-uploads the file to the current working collection in iRODS. The new data object
-is also named "test". After the file is uploaded it is deleted. During the run
-phase, it uses the Tool object under test to download the data object. Finally,
-during teardown, it deletes both the data object and the file created by the
-download.
+A download test performs the following actions. During setup, it creates a
+file of the size of the data object to be downloaded named "test" locally
+in the current working directory. While still in the set up phase, it
+uploads the file to the current working collection in iRODS. The new data
+object is also named "test". After the file is uploaded it is deleted.
+During the run phase, it uses the Tool object under test to download the
+data object. Finally, during teardown, it deletes both the data object and
+the file created by the download.
 
-The Python iRODS Client is used to perform the file transfers and clean up tasks
-that happen during setup and teardown. This module assumes that an iRODS session
-has been initialized for the zone where performance testing will happen.
+The Python iRODS Client is used to perform the file transfers and clean up
+tasks that happen during setup and teardown. This module assumes that an
+iRODS session has been initialized for the zone where performance testing
+will happen.
 """
 
 import os
@@ -41,12 +42,14 @@ except KeyError:
     _IRODS_ENV_FILE = path.expanduser('~/.irods/irods_environment.json')
 
 
-def _create_file(size):
+def _create_file(size: int):
     try:
         with open(_DATA_NAME, mode='ab') as file:
             file.truncate(size)
     except OSError as oe:
-        raise TestFailure(f"failed to create file {_DATA_NAME} of size {size} B") from oe
+        error_msg = f"failed to create file {_DATA_NAME} of size {size} B"
+        raise TestFailure(error_msg) from oe
+
 
 def _delete_file():
     if path.exists(_DATA_NAME):
@@ -63,9 +66,11 @@ def _delete_data_obj(irods):
         if irods.data_objects.exists(abs_path):
             irods.data_objects.unlink(abs_path, force=True)
     except LOCKED_DATA_OBJECT_ACCESS as exn:
-        raise TestFailure(f"failed to delete data object {_DATA_NAME}") from exn
+        error_msg = f"failed to delete data object {_DATA_NAME}"
+        raise TestFailure(error_msg) from exn
 
-def _create_data_obj(irods, size):
+
+def _create_data_obj(irods, size: int):
     _create_file(size)
     irods.data_objects.put(_DATA_NAME, _irods_path(irods), force=True)
     _delete_file()
@@ -103,7 +108,7 @@ class DownloadTestFactory(TestFactory):
     def test_name(self):
         return f'{self.__data_size} B download'
 
-    def make_test(self, tool):
+    def make_test(self, tool: Tool):
         return _DownloadTest(tool, self.__data_size)
 
 
@@ -142,5 +147,5 @@ class UploadTestFactory(TestFactory):
     def test_name(self):
         return f'{self.__data_size} B upload'
 
-    def make_test(self, tool):
+    def make_test(self, tool: Tool):
         return _UploadTest(tool, self.__data_size)
