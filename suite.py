@@ -180,7 +180,7 @@ class _ToolRun:
 
     def perform(self, recorder: Recorder) -> None:
         """This uses the tool to perform the action being tested."""
-        label = f"run {self.__id} of {self.__test_maker.test_name()} using {self.__tool.name()}"
+        label = f"run {self.__id} of {self.__test_maker.test_name()} using {self.__tool}"
         recorder.notify(f"performing {label}")
         test = self.__test_maker.make_test(self.__tool)
         try:
@@ -212,13 +212,13 @@ class _ToolRunSet:
         This measures the performance of a tool when it performs a given action.
         """
         recorder.notify(
-            f"performing {self.__test_maker.test_name()} tests using {self.__tool.name()}")
+            f"performing {self.__test_maker.test_name()} tests using {self.__tool}")
         for run in self.__runs:
             run.perform(recorder)
         result = _TestResult([
             run.duration() for run in self.__runs if run.duration()
         ])
-        recorder.log(f"{self.__tool.name()}: {result.geo_mean()} [{result.lb()}, {result.ub()}] s")
+        recorder.log(f"{self.__tool}: {result.geo_mean()} [{result.lb()}, {result.ub()}] s")
 
 
 class _PerformanceComparison:
