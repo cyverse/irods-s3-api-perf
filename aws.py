@@ -8,6 +8,7 @@ default.
 """
 
 import subprocess
+from subprocess import CalledProcessError
 
 from suite import TestFailure, Tool
 
@@ -38,17 +39,18 @@ class AWS(Tool):
         This method builds the AWS CLI command to copy an object from a
         source to a destination within S3 storage.
         """
-        exe = [
-            'aws',
-            '--cli-read-timeout=' + str(_READ_TIMEOUT),
-            's3',
-            'cp',
-            '--only-show-errors',
-            src,
-            dest]
-        results = subprocess.run(exe, capture_output=True, check=False)
-        if results.returncode != 0:
-            raise TestFailure(results.stderr.decode())
+        try:
+            exe = [
+                'aws',
+                f'--cli-read-timeout={_READ_TIMEOUT}',
+                's3',
+                'cp',
+                '--only-show-errors',
+                src,
+                dest]
+            subprocess.run(exe, capture_output=True, check=True)
+        except CalledProcessError as cpe:
+            raise TestFailure(cpe.stderr.decode()) from cpe
 
     def __mk_path_uri(self, path: str):
         return f"{self.__bucket_uri}/{path}"

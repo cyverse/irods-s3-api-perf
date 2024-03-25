@@ -8,6 +8,7 @@ testing will happen.
 """
 
 import subprocess
+from subprocess import CalledProcessError
 
 from suite import TestFailure, Tool
 
@@ -19,13 +20,13 @@ class ICommands(Tool):
         return 'iCommands'
 
     def download(self, path: str):
-        results = subprocess.run(['iget', path], capture_output=True,
-                                 check=False)
-        if results.returncode != 0:
-            raise TestFailure(results.stderr.decode())
+        try:
+            subprocess.run(['iget', path], capture_output=True, check=True)
+        except CalledProcessError as cpe:
+            raise TestFailure(cpe.stderr.decode()) from cpe
 
     def upload(self, path: str):
-        results = subprocess.run(['iput', path], capture_output=True,
-                                 check=False)
-        if results.returncode != 0:
-            raise TestFailure(results.stderr.decode())
+        try:
+            subprocess.run(['iput', path], capture_output=True, check=True)
+        except CalledProcessError as cpe:
+            raise TestFailure(cpe.stderr.decode()) from cpe

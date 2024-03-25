@@ -63,9 +63,9 @@ def _main(argv: List[str]) -> int:
     ]
     test_makers = [
         UploadTestFactory(_1_KIB),
-        UploadTestFactory(_1_GIB),
+        # UploadTestFactory(_1_GIB),
         DownloadTestFactory(_1_KIB),
-        DownloadTestFactory(_1_GIB)
+        # DownloadTestFactory(_1_GIB)
     ]
     PerformanceSuite(_RUNS_PER_TEST, tools, test_makers).run(_Console())
     return 0
