@@ -56,7 +56,7 @@ def _main(argv: List[str]) -> int:
         print("The name of the iRODS S3 bucket is required.")
         return 1
     bucket = argv[1]
-    tools=[
+    tools = [
         AWS(bucket),
         GoCommands(),
         ICommands(),
