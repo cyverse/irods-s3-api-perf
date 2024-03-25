@@ -4,8 +4,8 @@
 
 Given a set of tools and a set of transfer actions, this module provides a
 framework for comparing how long it takes each tool to perform each of the
-actions. To estimate how long a tool take to perform an action, the module has a
-tool perform an action multiple times. It then reports the geometric mean and
+actions. To estimate how long a tool take to perform an action, the module has
+a tool perform an action multiple times. It then reports the geometric mean and
 one-geometric standard deviation from the times it took the tool to perform the
 action.
 
@@ -29,14 +29,14 @@ class Recorder(ABC):
     """This class delivers messages to the caller."""
 
     @abstractmethod
-    def notify(self, msg:str) -> None:
+    def notify(self, msg: str) -> None:
         """This method sends a notification message.
         Args:
             msg  the message
         """
 
     @abstractmethod
-    def log(self, result:str) -> None:
+    def log(self, result: str) -> None:
         """This methods sends a test result to be logged.
         Args:
             result  the test result
@@ -49,7 +49,7 @@ class TestFailure(Exception):
         reason  a message providing information about the failure
     """
 
-    def __init__(self, reason:str=""):
+    def __init__(self, reason: str = ""):
         self._reason = reason
 
     def __str__(self):
@@ -60,11 +60,11 @@ class Tool(ABC):
     """This is a tool whose performance is to be tested."""
 
     @abstractmethod
-    def name(self) -> str:
+    def __str__(self) -> str:
         """This returns the name of the tool."""
 
     @abstractmethod
-    def download(self, path:str) -> None:
+    def download(self, path: str) -> None:
         """This downloads a copy of an iRODS data object.
         Args:
             path  This is the path to the data object relative to the current
@@ -73,7 +73,7 @@ class Tool(ABC):
         """
 
     @abstractmethod
-    def upload(self, path:str) -> None:
+    def upload(self, path: str) -> None:
         """This uploads a file to iRODS.
         Args:
             path  This is the path to the file relative to the current working
@@ -84,8 +84,8 @@ class Tool(ABC):
 
 class Test(ABC):
     """This is a performance test.
-    A performance test records how long it takes to perform the action being
-    tested.
+    A performance test records how long it takes to perform the
+    action being tested.
     """
 
     def __init__(self):
@@ -180,7 +180,7 @@ class _ToolRun:
 
     def perform(self, recorder: Recorder) -> None:
         """This uses the tool to perform the action being tested."""
-        label = f"run {self.__id} of {self.__test_maker.test_name()} using {self.__tool.name()}"
+        label = f"run {self.__id} of {self.__test_maker.test_name()} using {self.__tool}"
         recorder.notify(f"performing {label}")
         test = self.__test_maker.make_test(self.__tool)
         try:
@@ -202,30 +202,36 @@ class _ToolRunSet:
     def __init__(self, num_runs: int, tool: Tool, test_maker: TestFactory):
         self.__test_maker = test_maker
         self.__tool = tool
-        self.__runs = [_ToolRun(run_id, tool, test_maker) for run_id in range(1, num_runs + 1)]
+        self.__runs = [
+            _ToolRun(run_id, tool, test_maker)
+            for run_id in range(1, num_runs + 1)
+        ]
 
     def perform(self, recorder: Recorder) -> None:
         """
         This measures the performance of a tool when it performs a given action.
         """
         recorder.notify(
-            f"performing {self.__test_maker.test_name()} tests using {self.__tool.name()}" )
+            f"performing {self.__test_maker.test_name()} tests using {self.__tool}")
         for run in self.__runs:
             run.perform(recorder)
-        result = _TestResult([run.duration() for run in self.__runs if run.duration()])
-        recorder.log(f"{self.__tool.name()}: {result.geo_mean()} [{result.lb()}, {result.ub()}] s")
+        result = _TestResult([
+            run.duration() for run in self.__runs if run.duration()
+        ])
+        recorder.log(f"{self.__tool}: {result.geo_mean()} [{result.lb()}, {result.ub()}] s")
 
 
 class _PerformanceComparison:
 
     def __init__(self, num_runs: int, tools: List[Tool], test_maker: TestFactory):
         self.__test_maker = test_maker
-        self.__tool_runs = [ _ToolRunSet(num_runs, tool, test_maker) for tool in tools ]
+        self.__tool_runs = [
+            _ToolRunSet(num_runs, tool, test_maker) for tool in tools
+        ]
 
     def perform(self, recorder: Recorder) -> None:
         """
-        This measures the performance of each tool when it performs a given
-        action.
+        This measures the performance of each tool when it performs a given action.
         """
         recorder.notify(f"performing {self.__test_maker.test_name()} tests")
         recorder.log(f"\n{self.__test_maker.test_name()} results")
@@ -249,7 +255,9 @@ class PerformanceSuite:
     """
 
     def __init__(self, num_runs: int, tools: List[Tool], test_makers: List[TestFactory]):
-        self.__tests = [ _PerformanceComparison(num_runs, tools, maker) for maker in test_makers ]
+        self.__tests = [
+            _PerformanceComparison(num_runs, tools, maker) for maker in test_makers
+        ]
 
     def run(self, recorder: Recorder) -> None:
         """This runs all performance tests.

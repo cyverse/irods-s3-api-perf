@@ -15,13 +15,17 @@ from suite import TestFailure, Tool
 class ICommands(Tool):
     """This provides the transfer logic for testing iCommands."""
 
-    def name(self):
+    def __str__(self):
         return 'iCommands'
 
-    def download(self, path):
-        subprocess.run(['iget', path], check=False)
+    def download(self, path: str):
+        results = subprocess.run(['iget', path], capture_output=True,
+                                 check=False)
+        if results.returncode != 0:
+            raise TestFailure(results.stderr.decode())
 
-    def upload(self, path):
-        results = subprocess.run(['iput', path], capture_output=True, check=False)
+    def upload(self, path: str):
+        results = subprocess.run(['iput', path], capture_output=True,
+                                 check=False)
         if results.returncode != 0:
             raise TestFailure(results.stderr.decode())
